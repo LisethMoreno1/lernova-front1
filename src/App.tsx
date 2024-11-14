@@ -1,11 +1,7 @@
-import Component from "./modules/Dashboard/components/page";
-import Dashboard from "./modules/Dashboard/components/page";
+import HotelAdminLayout from "./modules/Dashboard/components/page";
 
 function App() {
-  return (
-    <Component/>
-
-  );
+  return <HotelAdminLayout />;
 }
 
 export default App;

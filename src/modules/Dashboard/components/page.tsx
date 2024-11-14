@@ -1,315 +1,240 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import {
-  Box,
+  AppBar,
+  Toolbar,
   Typography,
-  Card,
-  CardContent,
-  Button,
+  IconButton,
+  Drawer,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Drawer,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Divider,
-  styled,
+  Collapse,
+  Menu,
+  MenuItem,
+  Box,
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
 } from '@mui/material';
 import {
-  Home,
-  Language,
-  Analytics,
-  Subscriptions,
-  Settings,
-  Book,
-  Help,
+  Menu as MenuIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ExpandLess,
   ExpandMore,
-  CheckCircleOutline,
-  CancelOutlined,
-  Article,
-  Lock,
+  Dashboard,
+  Hotel,
+  People,
+  RoomService,
+  Assessment,
+  AccountCircle,
 } from '@mui/icons-material';
+import { styled } from '@mui/system';
 
-const drawerWidth = 240;
-
-const StyledDrawer = styled(Drawer)({
-  width: drawerWidth,
-  flexShrink: 0,
-  '& .MuiDrawer-paper': {
-    width: drawerWidth,
-    boxSizing: 'border-box',
-    borderRight: 'none',
-    backgroundColor: '#f8f9fa',
+// Custom theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#2A3F54', // Deep navy blue
+    },
+    secondary: {
+      main: '#E7A61A', // Warm gold
+    },
+    background: {
+      default: '#F4F5F7', // Light grayish blue
+    },
+  },
+  typography: {
+    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
   },
 });
 
-export default function Component() {
+const drawerWidth = 240;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+  open?: boolean;
+}>(({ theme, open }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  marginLeft: `-${drawerWidth}px`,
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: 0,
+  }),
+}));
+
+const AppBarStyled = styled(AppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})<{ open?: boolean }>(({ theme, open }) => ({
+  transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}));
+
+interface MenuItem {
+  text: string;
+  icon: React.ReactElement;
+  subItems?: string[];
+}
+
+const menuItems: MenuItem[] = [
+  { text: 'Dashboard', icon: <Dashboard /> },
+  { text: 'Reservations', icon: <Hotel />, subItems: ['New Booking', 'Manage Bookings', 'Calendar View'] },
+  { text: 'Guests', icon: <People />, subItems: ['Guest Profiles', 'VIP Guests', 'Feedback'] },
+  { text: 'Room Management', icon: <RoomService />, subItems: ['Room Status', 'Maintenance', 'Housekeeping'] },
+  { text: 'Reports', icon: <Assessment />, subItems: ['Occupancy', 'Revenue', 'Guest Satisfaction'] },
+];
+
+export default function HotelAdminLayout() {
+  const [open, setOpen] = useState(false);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  const handleItemClick = (text: string) => {
+    setExpandedItem(expandedItem === text ? null : text);
+  };
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f8f9fa' }}>
-      {/* Sidebar */}
-      <StyledDrawer variant="permanent">
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box component="img" src="/placeholder.svg" sx={{ width: 32, height: 32 }} />
-          <Typography variant="h6">Mosaic</Typography>
-        </Box>
-        <List sx={{ px: 2 }}>
-          <ListItem button>
-            <ListItemIcon>
-              <Home />
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <Language />
-            </ListItemIcon>
-            <ListItemText primary="Websites" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <Analytics />
-            </ListItemIcon>
-            <ListItemText primary="Analytics" />
-          </ListItem>
-          <ListItem button selected>
-            <ListItemIcon>
-              <Subscriptions />
-            </ListItemIcon>
-            <ListItemText primary="Subscription" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <Settings />
-            </ListItemIcon>
-            <ListItemText primary="Settings" />
-          </ListItem>
-        </List>
-        <Box sx={{ mt: 'auto' }}>
-          <List sx={{ px: 2 }}>
-            <ListItem button>
-              <ListItemIcon>
-                <Article />
-              </ListItemIcon>
-              <ListItemText primary="Changelog" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <Book />
-              </ListItemIcon>
-              <ListItemText primary="Blog" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <Help />
-              </ListItemIcon>
-              <ListItemText primary="Help & Guides" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <Lock />
-              </ListItemIcon>
-              <ListItemText primary="Privacy & Terms" />
-            </ListItem>
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBarStyled position="fixed" open={open}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{ mr: 2, ...(open && { display: 'none' }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+              Hotel Administration
+            </Typography>
+            <div>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose}>John Doe</MenuItem>
+                <MenuItem onClick={handleClose}>Log Out</MenuItem>
+                <MenuItem onClick={handleClose}>Contact Support</MenuItem>
+              </Menu>
+            </div>
+          </Toolbar>
+        </AppBarStyled>
+        <Drawer
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+              backgroundColor: theme.palette.primary.main,
+              color: 'white',
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open}
+        >
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose} sx={{ color: 'white' }}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </DrawerHeader>
+          <List>
+            {menuItems.map((item) => (
+              <React.Fragment key={item.text}>
+                <ListItem button onClick={() => handleItemClick(item.text)}>
+                  <ListItemIcon sx={{ color: 'white' }}>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                  {item.subItems && (expandedItem === item.text ? <ExpandLess /> : <ExpandMore />)}
+                </ListItem>
+                {item.subItems && (
+                  <Collapse in={expandedItem === item.text} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {item.subItems.map((subItem) => (
+                        <ListItem button sx={{ pl: 4 }} key={subItem}>
+                          <ListItemText primary={subItem} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Collapse>
+                )}
+              </React.Fragment>
+            ))}
           </List>
-        </Box>
-      </StyledDrawer>
-
-      {/* Main content */}
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h5" sx={{ mb: 1 }}>Subscription</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-          Manage your billing and invoices here.
-        </Typography>
-
-        {/* Pricing Cards */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 3, mb: 4 }}>
-          {/* Free Plan */}
-          <Card variant="outlined">
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="overline" sx={{ mb: 2, display: 'block' }}>
-                Free
-              </Typography>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                For Trying Out
-              </Typography>
-              <Typography variant="h4" component="div" sx={{ mb: 3 }}>
-                $0
-                <Typography component="span" variant="body2" color="text.secondary">
-                  /per month
-                </Typography>
-              </Typography>
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>500 Images</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>1 Website</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CancelOutlined color="error" sx={{ mr: 1 }} />
-                  <Typography>No Support</Typography>
-                </Box>
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                You are on Free Plan
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Pro Plan */}
-          <Card variant="outlined">
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="overline" sx={{ mb: 2, display: 'block' }}>
-                Pro
-              </Typography>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                For Individual Use
-              </Typography>
-              <Typography variant="h4" component="div" sx={{ mb: 3 }}>
-                $19
-                <Typography component="span" variant="body2" color="text.secondary">
-                  /per month
-                </Typography>
-              </Typography>
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>5000 Images</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>Unlimited Websites</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>Priority Email Support</Typography>
-                </Box>
-              </Box>
-              <Button variant="contained" color="primary" fullWidth>
-                Get Pro Plan →
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Pro Plus Plan */}
-          <Card variant="outlined">
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="overline" sx={{ mb: 2, display: 'block' }}>
-                Pro Plus
-              </Typography>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-                For Larger Websites
-              </Typography>
-              <Typography variant="h4" component="div" sx={{ mb: 3 }}>
-                Custom
-                <Typography component="span" variant="body2" color="text.secondary">
-                  /per month
-                </Typography>
-              </Typography>
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>Unlimited Images</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>Unlimited Websites</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CheckCircleOutline color="success" sx={{ mr: 1 }} />
-                  <Typography>Dedicated Account Manager</Typography>
-                </Box>
-              </Box>
-              <Button variant="outlined" color="primary" fullWidth>
-                Contact Us
-              </Button>
-            </CardContent>
-          </Card>
-        </Box>
-
-        {/* Invoice History Section */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Invoice History & Manage Plan</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Find the details of your previous invoices or to cancel your current subscription. 
-            If you have any questions regarding your invoices, please contact our support team.
+        </Drawer>
+        <Main open={open}>
+          <DrawerHeader />
+          <Typography paragraph>
+            Welcome to the Hotel Administration Dashboard. Select a module from the sidebar to get started.
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Button variant="outlined" startIcon={<Settings />}>
-              Manage Plan
-            </Button>
-          </Box>
-        </Box>
-
-        {/* FAQ Section */}
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Frequently Asked Questions</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            If you can't find the answer you're looking for, please check out our help articles
-          </Typography>
-          
-          <Box sx={{ mb: 4 }}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>What is an OG image?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2" color="text.secondary">
-                  An OG image is the image that appears when you share a link on social media.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>What's included in each plan?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2" color="text.secondary">
-                  Each plan includes different features. The Free plan includes basic features,
-                  while Pro and Pro Plus plans include additional features and support.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>How many free OG images do I get?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2" color="text.secondary">
-                  The Free plan includes 500 OG images.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>Why upgrade to Mosaic Pro?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2" color="text.secondary">
-                  Upgrading to Pro gives you access to more images, unlimited websites, and priority support.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>What happens if I hit the free plan limit?</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2" color="text.secondary">
-                  When you reach the free plan limit, you'll need to upgrade to continue creating new images.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          </Box>
-        </Box>
+        </Main>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 }
